@@ -1,24 +1,43 @@
-let pigeon;  
-let interaction;  
-let bgColor; 
+let pigeon;
+let interaction;
+let bgColor;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  noLoop();  
-
   // Initializes the pigeon and interaction instance
+  bgColor = color(251, 244, 236);  
   pigeon = new Pigeon();
   interaction = new Interaction();
-  bgColor = color(251, 244, 236); 
 }
 
 function draw() {
-  background(bgColor); 
-// draw pigeon
-  pigeon.draw();  
-//draw interation
-  interaction.drawInstructions();  
+  background(bgColor);
+  
+  drawWaves();  // draw waves
+  pigeon.draw();  // draw pigeon
+  interaction.drawInstructions();  // draw instruction text
 }
+
+//draw waves
+function drawWaves() {
+  stroke(100, 180, 255, 150);  
+  strokeWeight(1.5);
+  noFill();
+
+  let waveHeight = height * 0.8;  
+
+  for (let i = 0; i < 10; i++) {  // Set the number of waves
+    beginShape();
+    for (let x = 0; x < width; x += 20) {
+      let y = sin((x * 0.02 + i * 0.5)) * 10 + waveHeight + i * 10;  
+      vertex(x, y);
+    }
+    endShape();
+  }
+}
+
+
+
 
 // Pigeon class, including pigeon drawing and related properties
 class Pigeon {
@@ -29,39 +48,37 @@ class Pigeon {
     this.bodyOffsetY = 0;
     this.leafOffsetX = 0;
     this.leafOffsetY = 0;
-    this.scale = 1;
-    this.outlineColor = color(142, 144, 171);
-    this.eyeColor = color(0);
-    this.eyeSocketColor = color(42, 48, 72);
+    this.scale = 1;  
+    this.outlineColor = color(142, 144, 171);  
+    this.eyeColor = color(0); 
+    this.eyeSocketColor = color(42, 48, 72); 
   }
 
   draw() {
     push();
-    translate(windowWidth / 3.5, windowHeight / 7);
-    scale(this.scale);
-    translate(this.bodyOffsetX, this.bodyOffsetY);
+    translate(windowWidth / 3.5, windowHeight / 7);  // set pigeon's position
+    scale(this.scale);  // set scalling
+    translate(this.bodyOffsetX, this.bodyOffsetY);  //Application displacement
     noFill();
     stroke(this.outlineColor);
     strokeWeight(2);
 
-
-    this.drawBody();
-    this.drawLeaves();
-    this.drawBeak();
-    this.drawEyes();
+    this.drawBody();  
+    this.drawLeaves();  
+    this.drawBeak();  
+    this.drawEyes();  
     pop();
   }
 
-  // pigeon body
   drawBody() {
-    // pigeon head and chest
+    //  pigeon head and chest
     bezier(300, 180, 350, 148, 362, 138, 370, 120);
     bezier(370, 120, 392, 83, 429, 98, 440, 100);
     bezier(440, 100, 458, 99, 470, 110, 480, 109);
     bezier(480, 109, 447, 118, 440, 159, 440, 180);
     bezier(440, 180, 440, 280, 372, 328, 340, 340);
 
-    //wing the above
+    // wing the above
     bezier(20, 40, 160, 18, 323, 116, 372, 172);
     bezier(20, 40, 20, 60, 70, 69, 83, 80);
     bezier(83, 80, 0, 98, 28, 108, 100, 120);
@@ -86,7 +103,8 @@ class Pigeon {
     bezier(103, 343, 82, 398, 95, 435, 176, 314);
   }
 
-  // leaves
+
+  //leaves
   drawLeaves() {
     fill(26, 119, 75);
     stroke(26, 119, 75);
@@ -101,74 +119,53 @@ class Pigeon {
     bezier(462 + this.leafOffsetX, 121 + this.leafOffsetY, 464 + this.leafOffsetX, 136 + this.leafOffsetY, 470 + this.leafOffsetX, 138 + this.leafOffsetY, 470 + this.leafOffsetX, 158 + this.leafOffsetY);
   }
 
-  // beak
   drawBeak() {
     stroke(this.outlineColor);
-    line(446, 117, 480, 109);
+    line(446, 117, 480, 109);  
   }
 
-  // eyes
   drawEyes() {
     fill(this.eyeColor);
-    ellipse(425 + this.eyeOffsetX, 112 + this.eyeOffsetY, 5, 5);
+    ellipse(425 + this.eyeOffsetX, 112 + this.eyeOffsetY, 5, 5);  
     noFill();
     stroke(this.outlineColor);
     strokeWeight(2);
-    ellipse(425, 112, 12, 12);
-  }
-
-
-
-  // Adjust the pigeon offset according to the mouse
-  move(x, y) {
-    this.eyeOffsetX = constrain(map(x, 0, width, -3, 3), -3, 3);
-    this.eyeOffsetY = constrain(map(y, 0, height, -3, 3), -3, 3);
-    this.bodyOffsetX = map(x, 0, width, -10, 10);
-    this.bodyOffsetY = map(y, 0, height, -10, 10);
-    this.leafOffsetX = map(x, 0, width, -5, 5);
-    this.leafOffsetY = map(y, 0, height, -5, 5);
-    redraw();
-  }
-
-
-
-  // Adjust the scale of the pigeon
-  scaleChange(delta) {
-    this.scale = constrain(this.scale + delta * -0.001, 0.5, 2);
-    redraw();
-  }
-
-  // random color
-  changeColor() {
-    this.outlineColor = color(random(0, 255), random(0, 255), random(0, 255));
-    this.eyeColor = color(random(0, 255), random(0, 255), random(0, 255));
-    redraw();
+    ellipse(425, 112, 12, 12);  
   }
 }
 
-// Interactive classes that handle events and instructions
 class Interaction {
   drawInstructions() {
     fill(0);
     textSize(10);
     textAlign(CENTER);
-    text("Click to change the pigeon outline color", width / 2, height - 25);
-    text("Move the mouse to move pigeon", width / 2, height - 15);
-    text("Scroll to zoom in/out pigeon", width / 2, height - 5);
+    text("Click to change pigeon color", width / 2, height - 25);
+    text("Move mouse to move pigeon", width / 2, height - 15);
+    text("Scroll mouse to zoom in/ out the pigeon", width / 2, height - 5);
   }
 }
 
 // Mouse move,pigeon move
 function mouseMoved() {
-  pigeon.move(mouseX, mouseY);
+  pigeon.eyeOffsetX = constrain(map(mouseX, 0, width, -3, 3), -3, 3);
+  pigeon.eyeOffsetY = constrain(map(mouseY, 0, height, -3, 3), -3, 3);
+  pigeon.bodyOffsetX = map(mouseX, 0, width, -10, 10);
+  pigeon.bodyOffsetY = map(mouseY, 0, height, -10, 10);
+  pigeon.leafOffsetX = map(mouseX, 0, width, -5, 5);
+  pigeon.leafOffsetY = map(mouseY, 0, height, -5, 5);
+  redraw();
 }
 
-//mouse scroll, pigeon zoom in/out
-function mouseWheel(event) {
-  pigeon.scaleChange(event.delta);
-}
-
-// mouse click, pigeon change color
+//  mouse click, pigeon change color
 function mousePressed() {
-  pigeon.changeColor();
+  pigeon.outlineColor = color(random(0, 255), random(0, 255), random(0, 255));
+  pigeon.eyeColor = color(random(0, 255), random(0, 255), random(0, 255));
+  redraw();
+}
+
+// mouse scroll, pigeon zoom in/out
+function mouseWheel(event) {
+  pigeon.scale += event.delta * -0.001;  
+  pigeon.scale = constrain(pigeon.scale, 0.5, 2);  
+  redraw();
 }

@@ -1,1 +1,0 @@
-#Click mouse to change the pigeon outline color
