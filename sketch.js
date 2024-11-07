@@ -23,6 +23,7 @@ function draw() {
 // Pigeon class, including pigeon drawing and related properties
 class Pigeon {
   constructor() {
+    this.scale = 1;
     this.outlineColor = color(142, 144, 171);
     this.eyeColor = color(0);
     this.eyeSocketColor = color(42, 48, 72);
@@ -31,6 +32,7 @@ class Pigeon {
   draw() {
     push();
     translate(windowWidth / 3.5, windowHeight / 7);
+    scale(this.scale);
     noFill();
     stroke(this.outlineColor);
     strokeWeight(2);
@@ -107,6 +109,12 @@ class Pigeon {
     ellipse(425, 112, 12, 12);
   }
 
+  // Adjust the scale of the pigeon
+  scaleChange(delta) {
+    this.scale = constrain(this.scale + delta * -0.001, 0.5, 2);
+    redraw();
+  }
+
   // Random color change for pigeon
   changeColor() {
     this.outlineColor = color(random(0, 255), random(0, 255), random(0, 255));
@@ -121,12 +129,17 @@ class Interaction {
     fill(0);
     textSize(10);
     textAlign(CENTER);
-    text("Click to change the pigeon outline color", width / 2, height - 15);
+    text("Click to change the pigeon outline color", width / 2, height - 25);
+    text("Scroll to zoom in/out pigeon", width / 2, height - 5);
   }
+}
+
+// Mouse scroll, pigeon zoom in/out
+function mouseWheel(event) {
+  pigeon.scaleChange(event.delta);
 }
 
 // Mouse click, pigeon change color
 function mousePressed() {
   pigeon.changeColor();
 }
-
